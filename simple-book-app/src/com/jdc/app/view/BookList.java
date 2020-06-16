@@ -1,5 +1,5 @@
 package com.jdc.app.view;
 
-public class BookDetail {
+public class BookList {
 
 }

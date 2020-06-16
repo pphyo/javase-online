@@ -1,5 +1,5 @@
 package com.jdc.app.view;
 
-public class Author {
+public class AuthorList {
 
 }

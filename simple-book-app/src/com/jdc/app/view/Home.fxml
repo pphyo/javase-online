@@ -9,22 +9,21 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox styleClass="view" stylesheets="@common.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.jdc.app.view.Home">
+<VBox styleClass="view" stylesheets="@common.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jdc.app.view.Home">
    <children>
       <HBox styleClass="search-bar">
          <children>
-            <ComboBox prefWidth="150.0" promptText="Category" styleClass="combo" />
-            <TextField promptText="Enter Book Name" styleClass="txt-fld" />
-            <TextField promptText="Enter Author Name" styleClass="txt-fld" />
-            <DatePicker promptText="Pick a Date" styleClass="dt-pick" />
-            <Button mnemonicParsing="false" styleClass="btn" text="SEARCH" />
-            <Button mnemonicParsing="false" styleClass="btn" text="CLEAR" />
+            <ComboBox fx:id="category" prefWidth="150.0" promptText="Category" styleClass="combo" />
+            <ComboBox fx:id="authorName" prefWidth="150.0" promptText="Author" styleClass="combo" />
+            <TextField fx:id="bookName" promptText="Enter Book Name" styleClass="txt-fld" />
+            <DatePicker fx:id="releasedDate" promptText="Pick a Date" styleClass="dt-pick" />
+            <Button mnemonicParsing="false" onAction="#search" styleClass="btn" text="SEARCH" />
+            <Button mnemonicParsing="false" onAction="#clear" styleClass="btn" text="CLEAR" />
          </children>
       </HBox>
       <VBox styleClass="pad10" VBox.vgrow="ALWAYS">
          <children>
-            <TableView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tblList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn prefWidth="75.0" text="Category" />
                 <TableColumn prefWidth="75.0" text="Book Name" />

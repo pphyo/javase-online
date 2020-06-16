@@ -34,6 +34,10 @@
 	-fx-alignment: center-left;
 }
 
+.active {
+	-fx-background-color: s;
+}
+
 .nav-btn:hover {
 	-fx-background-color: s;
 	-fx-cursor: hand;
@@ -81,6 +85,29 @@
 	-fx-alignment: center-left;
 }
 
+.cat-box {
+	-fx-pref-width: 227px;
+	-fx-pref-height: 100px;
+	-fx-alignment: center;
+	-fx-border-color: s;
+	-fx-border-radius: 5px;
+}
+
+.cat-box:hover {
+	-fx-background-color: s;
+	-fx-background-radius: 5px;
+	-fx-cursor: hand;
+}
+
+.cat-box > Label {
+	-fx-text-fill: p;
+	-fx-font-size: 15px;
+}
+
+.cat-box:hover > Label {
+	-fx-text-fill: white;
+}
+
 .combo {
 	-fx-pref-width: 130px;
 	-fx-border-width: 1px;
@@ -112,6 +139,16 @@
 
 .btn:hover {
 	-fx-background-color: s;
+}
+
+ScrollPane {
+	-fx-fit-to-width: true;
+	-fx-padding: 10 20 10 10;
+}
+
+FlowPane {
+	-fx-hgap: 10px;
+	-fx-vgap: 10px;
 }
 
 .pad10 {
