@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox styleClass="view" stylesheets="@common.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1">
+<VBox styleClass="view" stylesheets="@common.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox styleClass="search-bar">
          <children>
@@ -22,7 +21,7 @@
             <Button mnemonicParsing="false" styleClass="btn" text="CLEAR" />
          </children>
       </HBox>
-      <VBox VBox.vgrow="ALWAYS">
+      <VBox styleClass="pad10" VBox.vgrow="ALWAYS">
          <children>
             <TableView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
               <columns>
@@ -39,7 +38,7 @@
             </TableView>
          </children>
          <VBox.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" />
+            <Insets />
          </VBox.margin>
       </VBox>
    </children>
