@@ -151,6 +151,37 @@ FlowPane {
 	-fx-vgap: 10px;
 }
 
+TextArea {
+	-fx-border-color: p;
+}
+
 .pad10 {
 	-fx-padding: 0 10 10 10;
+}
+
+.edit-view {
+	-fx-pref-width: 400px;
+	-fx-pref-height: 450px;
+}
+
+.edit-view-title-wrap {
+	-fx-pref-height: 80px;
+	-fx-background-color: p;
+	-fx-alignment: center;
+}
+
+.edit-view-title-wrap > Label {
+	-fx-font-size: 32px;
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+}
+
+.info-wrap {
+	-fx-alignment: center;
+	-fx-pref-height: 25px;
+}
+
+.info-wrap > Label {
+	-fx-font-size: 11px;
+	-fx-text-fill: red;
 }

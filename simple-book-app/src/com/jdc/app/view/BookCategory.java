@@ -42,7 +42,7 @@ public class BookCategory {
 	
 	public void search() {
 		catBoxHolder.getChildren().clear();
-		List<Category> catList = catService.findAll();
+		List<Category> catList = catService.findByName(name.getText());
 //		catList.stream().map(c -> new CategoryBox(c))
 //						.forEach(c -> catBoxHolder.getChildren().addAll(c));
 		catList.stream().map(CategoryBox::new)

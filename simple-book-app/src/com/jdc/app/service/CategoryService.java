@@ -19,7 +19,6 @@ public class CategoryService {
 	private final String insert = "insert into category (name) values (?)";
 	private final String update = "update category name = ? where id = ?";
 	private final String delete = "delete from category where id = ?";
-	private final String find = "select * from category where 1 = 1";
 	
 	private CategoryService() {}
 	
@@ -71,6 +70,7 @@ public class CategoryService {
 	}
 	
 	public List<Category> findAll() {
+		String find = "select * from category where 1 = 1";
 		List<Category> list = new ArrayList<>();
 		
 		try(Connection conn = ConnectionManager.getConnection();
@@ -89,12 +89,16 @@ public class CategoryService {
 	}
 	
 	public List<Category> findByName(String name) {
+		String find = "select * from category where 1 = 1";
 		List<Category> list = new ArrayList<>();
+		boolean isConcat = null != name && !name.isEmpty();
+		
 		
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(find.concat(" and name like ?"))) {
+				PreparedStatement stmt = conn.prepareStatement(isConcat ? find.concat(" and name like ?") : find)) {
 			
-			stmt.setString(1, name);
+			if(isConcat)
+				stmt.setString(1, "%".concat(name).concat("%"));
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next())
 				list.add(getObject(rs));
