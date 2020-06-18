@@ -7,6 +7,7 @@ public class Book {
 	private int id;
 	private String name;
 	private int price;
+	private String image;
 	private LocalDate releaseDate;
 	private String remark;
 
@@ -35,6 +36,14 @@ public class Book {
 
 	public void setPrice(int price) {
 		this.price = price;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 	public LocalDate getReleaseDate() {

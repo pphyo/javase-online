@@ -6,8 +6,12 @@ import com.jdc.app.entity.Author;
 import com.jdc.app.service.AuthorService;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 public class AuthorList {
 	
@@ -19,14 +23,24 @@ public class AuthorList {
 	private TextField country;
 	@FXML
 	private TableView<Author> tblList;
+	@FXML
+	private TableColumn<Author, String> nameCol;
+	@FXML
+	private TableColumn<Author, String> countryCol;
 	
 	private AuthorService authService;
 	
 	public void add() {
 		Author author = new Author();
-		author.setName(name.getText());
-		author.setAge(Integer.parseInt(age.getText()));
-		author.setCountry(country.getText());
+		if(!name.getText().isEmpty())
+			author.setName(name.getText());
+		
+		if(!age.getText().isEmpty())
+			author.setAge(Integer.parseInt(age.getText()));
+		
+		if(!country.getText().isEmpty())
+			author.setCountry(country.getText());
+		
 		authService.add(author);
 		search();
 		clear();
@@ -49,5 +63,29 @@ public class AuthorList {
 	private void initialize() {
 		authService = AuthorService.getInstance();
 		search();
+		
+		nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		nameCol.setOnEditCommit(e -> {
+			Author data = e.getRowValue();
+			data.setName(e.getNewValue());
+			authService.update(data);
+			search();
+		});
+		
+		countryCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		countryCol.setOnEditCommit(e -> {
+			Author data = e.getRowValue();
+			data.setCountry(e.getNewValue());
+			authService.update(data);
+			search();
+		});
+		
+		MenuItem delete = new MenuItem("Delete");
+		tblList.setContextMenu(new ContextMenu(delete));
+		delete.setOnAction(e -> {
+			Author author = tblList.getSelectionModel().getSelectedItem();
+			authService.delete(author);
+			search();
+		});
 	}
 }

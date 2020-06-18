@@ -16,7 +16,7 @@
    <children>
       <HBox styleClass="edit-view-title-wrap">
          <children>
-            <Label text="ADD AUTHOR" />
+            <Label fx:id="title" text="ADD AUTHOR" />
          </children>
       </HBox>
       <HBox styleClass="info-wrap">

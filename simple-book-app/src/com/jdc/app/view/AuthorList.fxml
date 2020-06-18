@@ -22,24 +22,24 @@
       </HBox>
       <HBox styleClass="pad10" VBox.vgrow="ALWAYS">
          <children>
-            <TableView fx:id="tblList" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+            <TableView fx:id="tblList" editable="true" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
               <columns>
                 <TableColumn maxWidth="800.0" minWidth="30.0" prefWidth="30.0" text="ID">
                 	<cellValueFactory>
                 		<PropertyValueFactory property="id" />
                 	</cellValueFactory>
                 </TableColumn>
-                <TableColumn prefWidth="75.0" text="Name">
+                <TableColumn fx:id="nameCol" prefWidth="75.0" text="Name">
                 	<cellValueFactory>
                 		<PropertyValueFactory property="name" />
                 	</cellValueFactory>
                 </TableColumn>
-                  <TableColumn maxWidth="800.0" minWidth="30.0" prefWidth="40.0" text="Age">
+                  <TableColumn fx:id="ageCol" maxWidth="800.0" minWidth="30.0" prefWidth="40.0" text="Age">
                 	<cellValueFactory>
                 		<PropertyValueFactory property="age" />
                 	</cellValueFactory>
                 </TableColumn>
-                  <TableColumn prefWidth="75.0" text="Country">
+                  <TableColumn fx:id="countryCol" prefWidth="75.0" text="Country">
                 	<cellValueFactory>
                 		<PropertyValueFactory property="country" />
                 	</cellValueFactory>

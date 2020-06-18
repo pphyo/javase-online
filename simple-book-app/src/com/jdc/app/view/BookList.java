@@ -1,7 +1,9 @@
 package com.jdc.app.view;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.jdc.app.entity.Author;
 import com.jdc.app.entity.Book;
@@ -12,15 +14,19 @@ import com.jdc.app.service.CategoryService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class BookList {
 	
 	@FXML
-	private ComboBox<String> category;
+	private ComboBox<Category> category;
 	@FXML
-	private ComboBox<String> authorName;
+	private ComboBox<Author> authorName;
 	@FXML
 	private DatePicker releaseDate;
 	@FXML
@@ -29,12 +35,16 @@ public class BookList {
 	private CategoryService catService;
 	private AuthorService authService;
 	private BookService bookService;
+	private Consumer<Book> listener;
 	
 	public void add() {
-		BookEdit.show();
+		BookEdit.show(null, this::listener);
 	}
 	
 	public void search() {
+		tblList.getItems().clear();
+		List<Book> bookList = bookService.findByParams(category.getValue(), authorName.getValue(), releaseDate.getValue());
+		tblList.getItems().addAll(bookList);
 		
 	}
 	
@@ -46,12 +56,63 @@ public class BookList {
 	
 	private void loadCategory() {
 		List<Category> catList = catService.findAll();
-		catList.stream().map(a -> a.getName()).forEach(a -> category.getItems().add(a));
+		category.getItems().addAll(catList);
 	}
 	
 	private void loadAuthor() {
 		List<Author> authList = authService.findAll();
-		authList.stream().map(a -> a.getName()).forEach(authorName.getItems()::addAll);
+		authorName.getItems().addAll(authList);
+	}
+	
+	private void listener(Book book) {
+		listener.accept(book);
+		search();
+	}
+	
+	private void edit() {
+		Book book = tblList.getSelectionModel().getSelectedItem();
+		BookEdit.show(book, this::listener);
+		bookService.update(book);
+		search();
+	}
+	
+	private void imageUpload() {
+		FileChooser fc = new FileChooser();
+		fc.setTitle("Select Book Cover");
+		fc.setSelectedExtensionFilter(new ExtensionFilter("Book Cover", "*.png", "*.jpg"));
+		fc.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
+		File file = fc.showOpenDialog(category.getScene().getWindow());
+		
+		Book book = tblList.getSelectionModel().getSelectedItem();
+		book.setImage(file.getAbsolutePath());
+		bookService.imgUpload(book);
+	}
+	
+	private void delete() {
+		Book book = tblList.getSelectionModel().getSelectedItem();
+		bookService.delete(book);
+		search();
+	}
+	
+	private void showDetail() {
+		Book book = tblList.getSelectionModel().getSelectedItem();
+		Detail.show(book);
+	}
+	
+	private void createMenu() {
+		MenuItem edit = new MenuItem("Edit");
+		MenuItem delete = new MenuItem("Delete");
+		MenuItem imgUpload = new MenuItem("Image Upload");
+		MenuItem detail = new MenuItem("Show Detail");
+		
+		ContextMenu menu = new ContextMenu(edit, delete, imgUpload, detail);
+		tblList.setContextMenu(menu);
+		
+		edit.setOnAction(e -> edit());
+		delete.setOnAction(e -> delete());
+		imgUpload.setOnAction(e -> imageUpload());
+		detail.setOnAction(e -> showDetail());
+		
 	}
 	
 	@FXML
@@ -61,6 +122,8 @@ public class BookList {
 		bookService = BookService.getInstance();
 		loadCategory();
 		loadAuthor();
+		createMenu();
+		search();
 	}
 
 }

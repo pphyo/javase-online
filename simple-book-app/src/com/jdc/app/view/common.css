@@ -185,3 +185,10 @@ TextArea {
 	-fx-font-size: 11px;
 	-fx-text-fill: red;
 }
+
+.detail-box {
+	-fx-spacing: 10px;
+	-fx-padding: 10px;
+	-fx-pref-width: 550px;
+	-fx-pref-height: 300px;
+}
