@@ -63,7 +63,7 @@
 }
 
 .title-wrap {
-	-fx-pref-height: 80px;
+	-fx-pref-height: 70px;
 	-fx-alignment: center-left;
 	-fx-padding: 10px;
 }
@@ -74,12 +74,14 @@
 }
 
 .view {
+	-fx-border-width: 2 0 0 0;
+	-fx-border-color: p;
 	-fx-pref-width: 750px;
 	-fx-pref-height: 520px;
 }
 
 .search-bar {
-	-fx-pref-height: 70px;
+	-fx-pref-height: 80px;
 	-fx-padding: 10px;
 	-fx-spacing: 10px;
 	-fx-alignment: center-left;
@@ -152,6 +154,7 @@ FlowPane {
 }
 
 TextArea {
+	-fx-padding: none;
 	-fx-border-color: p;
 }
 
@@ -191,4 +194,52 @@ TextArea {
 	-fx-padding: 10px;
 	-fx-pref-width: 550px;
 	-fx-pref-height: 300px;
+}
+
+.cart-wrap {
+	-fx-pref-width: 320px;
+}
+
+.cart-title-wrap {
+	-fx-alignment: center;
+	-fx-padding: 10px;
+	-fx-pref-height: 30px;
+}
+
+.cart-title-wrap > Label {
+	-fx-text-fill: p;
+	-fx-font-size: 15px;
+	-fx-font-weight: bold;
+}
+
+.cart-icon-wrap {
+	-fx-pref-height: 40px;
+	-fx-alignment: center-left;
+	-fx-padding: 10px;
+}
+
+.cart-btn-wrap {
+	-fx-alignment: center;
+	-fx-padding: 10px;
+	-fx-spacing: 10;
+}
+
+.cart-btn-wrap > .cart-btn {
+	-fx-padding: 10px;
+	-fx-alignment: center;
+	-fx-spacing: 10px;
+	-fx-pref-width: 200px;
+	-fx-pref-height: 70px;
+	-fx-border-color: p;
+	-fx-border-radius: 5px;
+}
+
+.cart-btn-wrap > .cart-btn > Label {
+	-fx-font-size: 15px;
+}
+
+.cart-btn-wrap > .cart-btn:hover {
+	-fx-background-color: s;
+	-fx-background-radius: 5px;
+	-fx-cursor: hand;
 }

@@ -124,6 +124,10 @@ public class BookList {
 		loadAuthor();
 		createMenu();
 		search();
+		
+		category.valueProperty().addListener((a, b, c) -> search());
+		authorName.valueProperty().addListener((a, b, c) -> search());
+		releaseDate.valueProperty().addListener((a, b, c) -> search());
 	}
 
 }

@@ -87,5 +87,9 @@ public class AuthorList {
 			authService.delete(author);
 			search();
 		});
+		
+		name.textProperty().addListener((a, b, c) -> search());
+		age.textProperty().addListener((a, b, c) -> search());
+		country.textProperty().addListener((a, b, c) -> search());
 	}
 }

@@ -59,9 +59,9 @@
             <Label text="Released Date" GridPane.rowIndex="4" />
             <DatePicker fx:id="releaseDate" promptText="Released Date" styleClass="dt-pick" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label text="Remark" GridPane.rowIndex="5" />
-            <HBox GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2">
+            <HBox prefHeight="74.0" prefWidth="211.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2">
                <children>
-                  <TextArea fx:id="remark" prefHeight="200.0" prefWidth="200.0" promptText="Enter Description" />
+                  <TextArea fx:id="remark" prefHeight="74.0" prefWidth="194.0" promptText="Enter Description" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="7">

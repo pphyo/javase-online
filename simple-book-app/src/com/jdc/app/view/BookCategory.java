@@ -9,6 +9,7 @@ import com.jdc.app.service.CategoryService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -58,6 +59,14 @@ public class BookCategory {
 	private void initialize() {
 		catService = CategoryService.getInstance();
 		search();
+		
+		name.textProperty().addListener((a, b, c) -> search());
+		
+		name.setOnKeyPressed(e -> {
+			if(e.getCode().equals(KeyCode.ENTER)) {
+				add();
+			}
+		});
 	}
 	
 	private class CategoryBox extends HBox {

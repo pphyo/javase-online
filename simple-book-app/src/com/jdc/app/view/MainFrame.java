@@ -45,6 +45,11 @@ public class MainFrame implements Initializable {
 		loadView("Author List", "AuthorList");
 	}
 	
+	public void showHistory(MouseEvent event) {
+		changeActive(event);
+		loadView("Sale History", "SaleHistory");
+	}
+	
 	private void changeActive(MouseEvent event) {
 		Node node = (Node)event.getSource();
 		sideBar.getChildren().stream()
