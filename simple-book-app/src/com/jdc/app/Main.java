@@ -18,7 +18,7 @@ public class Main extends Application{
 		Parent root = FXMLLoader.load(MainFrame.class.getResource("Login.fxml"));
 		Scene scene = new Scene(root);
 		stage.setTitle("Book Store Login");
-		stage.getIcons().add(new Image(new FileInputStream("icon/searchColor.png")));
+		stage.getIcons().add(new Image(new FileInputStream("icon/login.png")));
 		stage.setScene(scene);
 		stage.show();
 	}
