@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -13,25 +14,53 @@
    <children>
       <HBox styleClass="search-bar">
          <children>
-            <ComboBox prefWidth="150.0" promptText="Category" styleClass="combo" />
-            <TextField promptText="Enter Book Name" styleClass="txt-fld" />
-            <DatePicker promptText="Date From" styleClass="dt-pick" />
-            <DatePicker promptText="Date To" styleClass="dt-pick" />
-            <Button mnemonicParsing="false" styleClass="btn" text="SEARCH" />
-            <Button mnemonicParsing="false" styleClass="btn" text="CLEAR" />
+            <ComboBox fx:id="category" prefWidth="150.0" promptText="Category" styleClass="combo" />
+            <TextField fx:id="bookName" promptText="Enter Book Name" styleClass="txt-fld" />
+            <DatePicker fx:id="from" promptText="Pick a Date" styleClass="dt-pick" />
+            <DatePicker fx:id="to" promptText="Pick a Date" styleClass="dt-pick" />
+            <Button mnemonicParsing="false" onAction="#search" styleClass="btn" text="SEARCH" />
+            <Button mnemonicParsing="false" onAction="#clear" styleClass="btn" text="CLEAR" />
          </children>
       </HBox>
       <VBox styleClass="pad10" VBox.vgrow="ALWAYS">
          <children>
-            <TableView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tblList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
               <columns>
-                <TableColumn prefWidth="75.0" text="Category" />
-                <TableColumn prefWidth="75.0" text="Book Name" />
-                  <TableColumn prefWidth="75.0" text="Author" />
-                  <TableColumn maxWidth="500.0" minWidth="50.0" prefWidth="50.0" text="Price" />
-                  <TableColumn maxWidth="500.0" minWidth="50.0" prefWidth="50.0" text="Quantity" />
-                  <TableColumn maxWidth="500.0" minWidth="50.0" prefWidth="50.0" text="Tax" />
-                  <TableColumn maxWidth="500.0" minWidth="50.0" prefWidth="50.0" text="Total" />
+                <TableColumn maxWidth="2000.0" minWidth="150.0" prefWidth="150.0" text="Book Name">
+                	<cellValueFactory>
+                		<PropertyValueFactory property="bookName" />
+                	</cellValueFactory>
+                </TableColumn>
+                <TableColumn maxWidth="500.0" minWidth="100.0" prefWidth="100.0" text="Sale Date">
+                	<cellValueFactory>
+                		<PropertyValueFactory property="saleDate" />
+                	</cellValueFactory>
+                </TableColumn>
+                  <TableColumn maxWidth="500.0" minWidth="100.0" prefWidth="100.0" text="Sale Time">
+                	<cellValueFactory>
+                		<PropertyValueFactory property="saleTime" />
+                	</cellValueFactory>
+                </TableColumn>
+                  <TableColumn maxWidth="800.0" minWidth="50.0" prefWidth="50.0" text="Price">
+                	<cellValueFactory>
+                		<PropertyValueFactory property="unitPrice" />
+                	</cellValueFactory>
+                </TableColumn>
+                  <TableColumn maxWidth="500.0" minWidth="50.0" prefWidth="50.0" text="Quantity">
+                	<cellValueFactory>
+                		<PropertyValueFactory property="quantity" />
+                	</cellValueFactory>
+                </TableColumn>
+                  <TableColumn maxWidth="200.0" minWidth="50.0" prefWidth="50.0" text="Tax">
+                	<cellValueFactory>
+                		<PropertyValueFactory property="tax" />
+                	</cellValueFactory>
+                </TableColumn>
+                  <TableColumn maxWidth="800.0" minWidth="50.0" prefWidth="50.0" text="Total">
+                     <cellValueFactory>
+                        <PropertyValueFactory property="total" />
+                     </cellValueFactory>
+                  </TableColumn>
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

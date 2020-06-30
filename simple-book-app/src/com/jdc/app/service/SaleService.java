@@ -1,5 +1,7 @@
 package com.jdc.app.service;
 
+import static com.jdc.app.util.SqlHelper.getSql;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -11,12 +13,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.jdc.app.entity.Author;
 import com.jdc.app.entity.Book;
 import com.jdc.app.entity.Category;
 import com.jdc.app.entity.Sale;
 import com.jdc.app.entity.SaleDTO;
-import com.jdc.app.entity.SaleDeatil;
+import com.jdc.app.entity.SaleDetail;
 import com.jdc.app.util.ConnectionManager;
 
 public class SaleService {
@@ -32,84 +33,94 @@ public class SaleService {
 		return INSTANCE;
 	}
 	
-	public void insert(SaleDTO saleDTO) {
-		String saleInsert = "insert into sale (sale_date, sale_time, tax) values (?, ?, ?)";
-		String detailInsert = "insert into sale_detail (quantity, unit_price, book_id, sale_id, book_category_id, book_author_id) values (?, ?, ?, ?, ?, ?)";
-		
+	public void save(SaleDTO dto) {
+		if(dto.getSale().getId() == 0) {
+			add(dto);
+		} else {
+			update(dto);
+		}
+	}
+	
+	public void add(SaleDTO saleDTO) {
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement insertSale = conn.prepareStatement(saleInsert, Statement.RETURN_GENERATED_KEYS);
-				PreparedStatement insertDetail = conn.prepareStatement(detailInsert)) {
+				PreparedStatement saleInsert = conn.prepareStatement(getSql("sale.insert"), Statement.RETURN_GENERATED_KEYS);
+				PreparedStatement detailInsert = conn.prepareStatement(getSql("sd.insert"))) {
 			
 			Sale sale = saleDTO.getSale();
+			saleInsert.setDate(1, Date.valueOf(sale.getSaleDate()));
+			saleInsert.setTime(2, Time.valueOf(sale.getSaleTime()));
+			saleInsert.setInt(3, sale.getTax());
+			saleInsert.executeUpdate();
 			
-			insertSale.setDate(1, Date.valueOf(sale.getSaleDate()));
-			insertSale.setTime(2, Time.valueOf(sale.getSaleTime()));
-			insertSale.setInt(3, sale.getTax());
-			insertSale.executeUpdate();
+			ResultSet rs = saleInsert.getGeneratedKeys();
 			
-			ResultSet rs = insertSale.getGeneratedKeys();
 			while(rs.next()) {
 				
-				sale.setId(rs.getInt(1));
+				int saleId = rs.getInt(1);
 				
-				List<SaleDeatil> details = saleDTO.getDetails();
-				
-				for(SaleDeatil sd : details) {
-					
-					insertDetail.setInt(1, sd.getQuantity());
-					insertDetail.setInt(2, sd.getUnitPrice());
-					insertDetail.setInt(3, sd.getBook().getId());
-					insertDetail.setInt(4, sd.getSale().getId());
-					insertDetail.setInt(5, sd.getCategory().getId());
-					insertDetail.setInt(6, sd.getAuthor().getId());
-					
-					insertDetail.addBatch();
-					
+				for(SaleDetail sd : saleDTO.getDetail()) {
+					detailInsert.setInt(1, sd.getQuantity());
+					detailInsert.setInt(2, sd.getUnitPrice());
+					detailInsert.setInt(3, sd.getBook().getId());
+					detailInsert.setInt(4, saleId);
+					detailInsert.addBatch();
 				}
 				
-				insertDetail.executeBatch();
+				detailInsert.executeBatch();
 				
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public void update(SaleDTO saleDTO) {
-		String insertSD = "insert into sale_detail (quantity, unit_price, book_id, sale_id, book_category_id, book_author_id) values (?, ?, ?, ?, ?, ?)";
-		String updateSD = "update sale_detail set quantity = ?, unit_price = ? where id = ?";
-		String deleteSD = "delete from sale_detail where id = ?";
-		
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement sdInsert = conn.prepareStatement(insertSD);
-				PreparedStatement sdUpdate= conn.prepareStatement(updateSD);
-				PreparedStatement sdDelete = conn.prepareStatement(deleteSD);) {
+				PreparedStatement insert = conn.prepareStatement(getSql("sd.insert"));
+				PreparedStatement update = conn.prepareStatement(getSql("sd.update"));
+				PreparedStatement delete = conn.prepareStatement(getSql("sd.delete"))) {
 			
-			
+			for(SaleDetail sd : saleDTO.getDetail()) {
+				
+				if(sd.getId() == 0) {
+					insert.setInt(1, sd.getQuantity());
+					insert.setInt(2, sd.getUnitPrice());
+					insert.setInt(3, sd.getBook().getId());
+					insert.setInt(4, sd.getSale().getId());
+					insert.executeUpdate();
+				} else {
+					if(sd.isDelete()) {
+						delete.setInt(1, sd.getId());
+						delete.executeUpdate();
+					} else {
+						update.setInt(1, sd.getQuantity());
+						update.setInt(2, sd.getUnitPrice());
+						update.setInt(3, sd.getId());
+						update.executeUpdate();
+					}
+				}
+				
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
-	public List<Sale> findSale(LocalDate dateFrom, LocalDate dateTo) {
-		String sql = "select * from sale where 1 = 1";
-		
+	public List<Sale> findSale(LocalDate from, LocalDate to) {
 		List<Sale> result = new ArrayList<>();
-		StringBuilder sb = new StringBuilder(sql);
+		StringBuilder sb = new StringBuilder(getSql("sale.find"));
 		List<Object> params = new LinkedList<>();
 		
-		if(null != dateFrom && dateFrom.isBefore(dateTo)) {
+		if(null != from && from.isBefore(to)) {
 			sb.append(" and sale_date >= ?");
-			params.add(Date.valueOf(dateFrom));
+			params.add(Date.valueOf(from));
 		}
 		
-		if(null != dateTo && dateTo.isAfter(dateFrom)) {
+		if(null != to && to.isAfter(from)) {
 			sb.append(" and sale_date <= ?");
-			params.add(Date.valueOf(dateTo));
+			params.add(Date.valueOf(to));
 		}
 		
 		try(Connection conn = ConnectionManager.getConnection();
@@ -122,34 +133,24 @@ public class SaleService {
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
 				Sale s = new Sale();
-				s.setId(rs.getInt("id"));
-				s.setSaleDate(rs.getDate("sale_date").toLocalDate());
-				s.setSaleTime(rs.getTime("sale_time").toLocalTime());
+				s.setId(rs.getInt(1));
+				s.setSaleDate(rs.getDate(2).toLocalDate());
+				s.setSaleTime(rs.getTime(3).toLocalTime());
+				s.setTax(rs.getInt(4));
+				s.setCount(rs.getInt(5));
+				s.setSubTotal(rs.getInt(6));
 				result.add(s);
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return result;
 	}
-	
-	public List<SaleDeatil> findSaleDeatil(Category category, String bookName, LocalDate dateFrom, LocalDate dateTo) {
-		String sql = "select c.name category_name, b.name book_name, "
-				+ "a.name author_name, s.tax sale_tax, sd.id sd_id, "
-				+ "sd.sale_id sale_id, sd.book_id book_id, "
-				+ "sd.book_category_id book_category_id, "
-				+ "sd.book_author_id book_author_id, "
-				+ "sd.unit_price unit_price, sd.quantity quantity, "
-				+ "sum(sd.unit_price * sd.quantiry + s.tax) total from sale_detail sd join book b "
-				+ "on sd.book_id = b.id join sale s "
-				+ "on sd.sale_id = s.id join category c "
-				+ "on sd.book_category_id = c.id join author a "
-				+ "on sd.book_author_id = a.id where 1 = 1";		
-		
-		List<SaleDeatil> result = new ArrayList<>();
-		StringBuilder sb = new StringBuilder(sql);
+
+	public List<SaleDetail> findSaleDetail(Category category, String bookName, LocalDate from, LocalDate to) {
+		List<SaleDetail> result = new ArrayList<>();
+		StringBuilder sb = new StringBuilder(getSql("sd.find"));
 		List<Object> params = new LinkedList<>();
 		
 		if(null != category) {
@@ -157,14 +158,19 @@ public class SaleService {
 			params.add(category.getName());
 		}
 		
-		if(null != dateFrom && dateFrom.isBefore(dateTo)) {
-			sb.append(" and s.sale_date >= ?");
-			params.add(Date.valueOf(dateTo));
+		if(null != bookName && !bookName.isEmpty()) {
+			sb.append(" and b.name like ?");
+			params.add("%".concat(bookName).concat("%"));
 		}
 		
-		if(null != dateTo && dateTo.isAfter(dateFrom)) {
-			sb.append(" and s.sale_date <= ?");
-			params.add(Date.valueOf(dateFrom));
+		if(null != from && from.isBefore(to)) {
+			sb.append(" and sale_date >= ?");
+			params.add(Date.valueOf(from));
+		}
+		
+		if(null != to && to.isAfter(from)) {
+			sb.append(" and sale_date <= ?");
+			params.add(Date.valueOf(to));
 		}
 		
 		try(Connection conn = ConnectionManager.getConnection();
@@ -176,46 +182,32 @@ public class SaleService {
 			
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
-				
-				SaleDeatil sd = new SaleDeatil();
-				sd.setId(rs.getInt("sd_id"));
+				SaleDetail sd = new SaleDetail();
+				sd.setId(rs.getInt("id"));
 				sd.setQuantity(rs.getInt("quantity"));
 				sd.setUnitPrice(rs.getInt("unit_price"));
+				sd.setDelete(true);
 				
 				Sale s = new Sale();
 				s.setId(rs.getInt("sale_id"));
-				s.setTax(rs.getInt("sale_tax"));
+				s.setTax(rs.getInt("tax"));
+				s.setSaleDate(rs.getDate("sale_date").toLocalDate());
+				s.setSaleTime(rs.getTime("sale_time").toLocalTime());
 				
 				Book b = new Book();
 				b.setId(rs.getInt("book_id"));
-				b.setName("book_name");
-				
-				Category c = new Category();
-				c.setId(rs.getInt("book_category_id"));
-				c.setName(rs.getString("category_name"));
-				
-				Author a = new Author();
-				a.setId(rs.getInt("book_author_id"));
-				a.setName(rs.getString("author_name"));
-				
-				sd.setAuthor(a);
+				b.setName(rs.getString("book_name"));
+
 				sd.setBook(b);
-				sd.setCategory(c);
 				sd.setSale(s);
 				
 				result.add(sd);
-				
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return result;
 	}
 
 }
-
-
-
-

@@ -9,19 +9,17 @@ import java.util.Properties;
 public class ConnectionManager {
 
 	private static Properties prop;
-	private static String usr;
 	private static String url;
+	private static String usr;
 	private static String pwd;
 	
 	static {
 		try {
-			
 			prop = new Properties();
-			prop.load(new FileInputStream("application.properties"));;
+			prop.load(new FileInputStream("application.properties"));
 			url = prop.getProperty("db.url");
 			usr = prop.getProperty("db.usr");
 			pwd = prop.getProperty("db.pwd");
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

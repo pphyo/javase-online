@@ -12,11 +12,11 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox styleClass="edit-view" stylesheets="@common.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jdc.app.view.BookEdit">
+<VBox styleClass="book-edit-view" stylesheets="@common.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jdc.app.view.BookEdit">
    <children>
-      <HBox styleClass="edit-view-title-wrap">
+      <HBox styleClass="book-title-wrap">
          <children>
-            <Label fx:id="title" text="ADD AUTHOR" />
+            <Label fx:id="title" text="ADD BOOK" />
          </children>
       </HBox>
       <HBox styleClass="info-wrap">
@@ -26,47 +26,48 @@
       </HBox>
       <GridPane hgap="10.0" vgap="10.0">
         <columnConstraints>
-          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="135.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="261.0" minWidth="10.0" prefWidth="255.0" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="120.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="275.0" minWidth="10.0" prefWidth="270.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="Category" />
-            <ComboBox fx:id="category" prefWidth="150.0" promptText="Category" styleClass="combo" GridPane.columnIndex="1" />
-            <Label text="Author Name" GridPane.rowIndex="1" />
-            <ComboBox fx:id="authorName" prefWidth="150.0" promptText="Author Name" styleClass="combo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="Author" GridPane.rowIndex="1" />
             <Label text="Book Name" GridPane.rowIndex="2" />
+            <Label text="Price" GridPane.rowIndex="3" />
+            <Label text="Released Date" GridPane.rowIndex="4" />
+            <Label text="Remark" GridPane.rowIndex="5" />
+            <ComboBox fx:id="category" prefWidth="150.0" promptText="Category" GridPane.columnIndex="1" />
+            <ComboBox fx:id="authorName" prefWidth="150.0" promptText="Author Name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
-                  <TextField fx:id="bookName" promptText="Enter Book Name" styleClass="txt-fld" />
+                  <TextField fx:id="bookName" promptText="Enter Book Name" />
                </children>
             </HBox>
-            <Label text="Price" GridPane.rowIndex="3" />
             <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
-                  <TextField fx:id="price" promptText="Enter price" styleClass="txt-fld" />
+                  <TextField fx:id="price" promptText="Enter Price" />
                </children>
             </HBox>
-            <Label text="Released Date" GridPane.rowIndex="4" />
-            <DatePicker fx:id="releaseDate" promptText="Released Date" styleClass="dt-pick" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Label text="Remark" GridPane.rowIndex="5" />
-            <HBox prefHeight="74.0" prefWidth="211.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2">
+            <DatePicker fx:id="releaseDate" promptText="Released Date" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <HBox GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2">
                <children>
-                  <TextArea fx:id="remark" prefHeight="74.0" prefWidth="194.0" promptText="Enter Description" />
+                  <TextArea fx:id="remark" prefHeight="200.0" prefWidth="200.0" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+            <HBox styleClass="edit-view-btn-wrap" GridPane.columnIndex="1" GridPane.rowIndex="7">
                <children>
                   <Button mnemonicParsing="false" onAction="#save" styleClass="btn" text="SAVE" />
+                  <Button mnemonicParsing="false" onAction="#reset" styleClass="btn" text="RESET" />
                   <Button mnemonicParsing="false" onAction="#close" styleClass="btn" text="CLOSE" />
                </children>
             </HBox>

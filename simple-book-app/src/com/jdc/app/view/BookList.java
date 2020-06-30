@@ -1,9 +1,7 @@
 package com.jdc.app.view;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.jdc.app.entity.Author;
 import com.jdc.app.entity.Book;
@@ -18,6 +16,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -28,64 +27,22 @@ public class BookList {
 	@FXML
 	private ComboBox<Author> authorName;
 	@FXML
+	private TextField bookName;
+	@FXML
 	private DatePicker releaseDate;
 	@FXML
 	private TableView<Book> tblList;
-	
 	private CategoryService catService;
 	private AuthorService authService;
 	private BookService bookService;
-	private Consumer<Book> listener;
 	
 	public void add() {
-		BookEdit.show(null, this::listener);
+		BookEdit.show(null, this::save);
 	}
 	
-	public void search() {
-		tblList.getItems().clear();
-		List<Book> bookList = bookService.findByParams(category.getValue(), authorName.getValue(), releaseDate.getValue());
-		tblList.getItems().addAll(bookList);
-		
-	}
-	
-	public void clear() {
-		category.setValue(null);
-		authorName.setValue(null);
-		releaseDate.setValue(LocalDate.now());
-	}
-	
-	private void loadCategory() {
-		List<Category> catList = catService.findAll();
-		category.getItems().addAll(catList);
-	}
-	
-	private void loadAuthor() {
-		List<Author> authList = authService.findAll();
-		authorName.getItems().addAll(authList);
-	}
-	
-	private void listener(Book book) {
-		listener.accept(book);
-		search();
-	}
-	
-	private void edit() {
+	private void update() {
 		Book book = tblList.getSelectionModel().getSelectedItem();
-		BookEdit.show(book, this::listener);
-		bookService.update(book);
-		search();
-	}
-	
-	private void imageUpload() {
-		FileChooser fc = new FileChooser();
-		fc.setTitle("Select Book Cover");
-		fc.setSelectedExtensionFilter(new ExtensionFilter("Book Cover", "*.png", "*.jpg"));
-		fc.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
-		File file = fc.showOpenDialog(category.getScene().getWindow());
-		
-		Book book = tblList.getSelectionModel().getSelectedItem();
-		book.setImage(file.getAbsolutePath());
-		bookService.imgUpload(book);
+		BookEdit.show(book, this::save);
 	}
 	
 	private void delete() {
@@ -94,25 +51,45 @@ public class BookList {
 		search();
 	}
 	
+	private void imgUpload() {
+		FileChooser fc = new FileChooser();
+		fc.setTitle("Choose Book Cover");
+		fc.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
+		fc.setSelectedExtensionFilter(new ExtensionFilter("Book Cover", "*.png", ".jpg"));
+		
+		File file = fc.showOpenDialog(category.getScene().getWindow());
+		Book book = tblList.getSelectionModel().getSelectedItem();
+		book.setImage(file.getAbsolutePath());
+		bookService.imageUpload(book);
+	}
+	
 	private void showDetail() {
 		Book book = tblList.getSelectionModel().getSelectedItem();
 		Detail.show(book);
 	}
 	
+	private void save(Book book) {
+		search();
+	}
+	
+	public void search() {
+		tblList.getItems().clear();
+		List<Book> bookList = bookService.findByParams(category.getValue(), authorName.getValue(), bookName.getText(), releaseDate.getValue());
+		tblList.getItems().addAll(bookList);
+		
+	}
+	
 	private void createMenu() {
 		MenuItem edit = new MenuItem("Edit");
 		MenuItem delete = new MenuItem("Delete");
-		MenuItem imgUpload = new MenuItem("Image Upload");
-		MenuItem detail = new MenuItem("Show Detail");
+		MenuItem imgUpload= new MenuItem("Image Upload");
+		MenuItem detail = new MenuItem("Book Detail");
 		
-		ContextMenu menu = new ContextMenu(edit, delete, imgUpload, detail);
-		tblList.setContextMenu(menu);
-		
-		edit.setOnAction(e -> edit());
+		tblList.setContextMenu(new ContextMenu(edit, delete, imgUpload, detail));
+		edit.setOnAction(e -> update());
 		delete.setOnAction(e -> delete());
-		imgUpload.setOnAction(e -> imageUpload());
+		imgUpload.setOnAction(e -> imgUpload());
 		detail.setOnAction(e -> showDetail());
-		
 	}
 	
 	@FXML
@@ -120,14 +97,12 @@ public class BookList {
 		catService = CategoryService.getInstance();
 		authService = AuthorService.getInstance();
 		bookService = BookService.getInstance();
-		loadCategory();
-		loadAuthor();
-		createMenu();
 		search();
 		
-		category.valueProperty().addListener((a, b, c) -> search());
-		authorName.valueProperty().addListener((a, b, c) -> search());
-		releaseDate.valueProperty().addListener((a, b, c) -> search());
+		category.getItems().addAll(catService.findAll());
+		authorName.getItems().addAll(authService.findAll());
+		
+		createMenu();
 	}
 
 }

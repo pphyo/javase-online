@@ -4,10 +4,9 @@ import java.util.List;
 
 import com.jdc.app.entity.Author;
 import com.jdc.app.service.AuthorService;
+import com.jdc.app.util.DecimalFormatedConverter;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -16,7 +15,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 public class AuthorList {
 	
 	@FXML
-	private TextField name;
+	private TextField authorName;
 	@FXML
 	private TextField age;
 	@FXML
@@ -26,48 +25,73 @@ public class AuthorList {
 	@FXML
 	private TableColumn<Author, String> nameCol;
 	@FXML
+	private TableColumn<Author, Integer> ageCol;
+	@FXML
 	private TableColumn<Author, String> countryCol;
 	
 	private AuthorService authService;
 	
 	public void add() {
 		Author author = new Author();
-		if(!name.getText().isEmpty())
-			author.setName(name.getText());
-		
-		if(!age.getText().isEmpty())
-			author.setAge(Integer.parseInt(age.getText()));
-		
+		if(!authorName.getText().isEmpty())
+			author.setName(authorName.getText());
+		if(getAge() > 0)
+			author.setAge(getAge());
 		if(!country.getText().isEmpty())
 			author.setCountry(country.getText());
-		
+
 		authService.add(author);
 		search();
-		clear();
 	}
 	
 	public void search() {
 		tblList.getItems().clear();
-		int age = this.age.getText().isEmpty() ? 0 : Integer.parseInt(this.age.getText());
-		List<Author> authList = authService.finByParams(name.getText(), age, country.getText());
+		List<Author> authList = authService.findByParam(authorName.getText(), getAge(), country.getText());
 		tblList.getItems().addAll(authList);
 	}
 	
 	public void clear() {
-		name.clear();
+		authorName.clear();
 		age.clear();
 		country.clear();
 	}
+	
+	private void listener() {
+		authorName.textProperty().addListener((a, b, c) -> {
+			search();
+		});
+		age.textProperty().addListener((a, b, c) -> {
+			search();
+		});
+		country.textProperty().addListener((a, b, c) -> {
+			search();
+		});
+	}
 
+	public int getAge() {
+		return this.age.getText().isEmpty() ? 0 : Integer.parseInt(this.age.getText());
+	}
+	
 	@FXML
 	private void initialize() {
 		authService = AuthorService.getInstance();
 		search();
 		
+		listener();
+		
+		
 		nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		nameCol.setOnEditCommit(e -> {
 			Author data = e.getRowValue();
 			data.setName(e.getNewValue());
+			authService.update(data);
+			search();
+		});
+		
+		ageCol.setCellFactory(TextFieldTableCell.forTableColumn(new DecimalFormatedConverter()));
+		ageCol.setOnEditCommit(e -> {
+			Author data = e.getRowValue();
+			data.setAge(e.getNewValue());
 			authService.update(data);
 			search();
 		});
@@ -79,17 +103,6 @@ public class AuthorList {
 			authService.update(data);
 			search();
 		});
-		
-		MenuItem delete = new MenuItem("Delete");
-		tblList.setContextMenu(new ContextMenu(delete));
-		delete.setOnAction(e -> {
-			Author author = tblList.getSelectionModel().getSelectedItem();
-			authService.delete(author);
-			search();
-		});
-		
-		name.textProperty().addListener((a, b, c) -> search());
-		age.textProperty().addListener((a, b, c) -> search());
-		country.textProperty().addListener((a, b, c) -> search());
 	}
+
 }

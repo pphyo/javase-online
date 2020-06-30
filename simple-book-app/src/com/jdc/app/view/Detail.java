@@ -18,15 +18,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Detail {
-
+	
 	@FXML
 	private ImageView image;
 	@FXML
 	private Label category;
 	@FXML
-	private Label authorName;
-	@FXML
 	private Label bookName;
+	@FXML
+	private Label authorName;
 	@FXML
 	private Label price;
 	@FXML
@@ -34,19 +34,23 @@ public class Detail {
 	@FXML
 	private Label remark;
 	
-	private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	
+	private BookService bookService;
 	
 	public static void show(Book book) {
 		try {
 			
 			FXMLLoader loader = new FXMLLoader(Detail.class.getResource("Detail.fxml"));
-			Stage stage = new Stage();
 			Parent view = loader.load();
 			Detail controller = loader.getController();
+			Stage stage = new Stage();
+			stage.setScene(new Scene(view));
+			
 			controller.setData(book);
 			
+			stage.getIcons().add(new Image(new FileInputStream("detail.png")));
 			stage.setTitle("Book Detail");
-			stage.setScene(new Scene(view));
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.show();
 			
@@ -57,14 +61,15 @@ public class Detail {
 	
 	private void setData(Book book) throws FileNotFoundException {
 		if(null != book) {
-			category.setText(book.getCategory().getName());
-			authorName.setText(book.getAuthor().getName());
+			String image = bookService.findImage(book);
+			if(null != image && !image.isEmpty())
+				this.image.setImage(new Image(new FileInputStream(image)));
+			category.setText(book.getCategory().toString());
+			authorName.setText(book.getAuthor().toString());
 			bookName.setText(book.getName());
-			if(null != BookService.getInstance().getImage(book))
-				image.setImage(new Image(new FileInputStream(BookService.getInstance().getImage(book))));
 			price.setText(String.valueOf(book.getPrice()));
-			releaseDate.setText(String.valueOf(DF.format(book.getReleaseDate())));
-			remark.setText(book.getRemark().isEmpty() ? "Unknown" : book.getRemark());
+			releaseDate.setText(String.valueOf(format.format(book.getReleaseDate())));
+			remark.setText(book.getRemark());
 		}
 	}
 	
@@ -73,7 +78,12 @@ public class Detail {
 	}
 	
 	public void close() {
-		category.getScene().getWindow().hide();
+		image.getScene().getWindow().hide();
+	}
+
+	@FXML
+	private void initialize() {
+		bookService = BookService.getInstance();
 	}
 	
 }

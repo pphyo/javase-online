@@ -15,10 +15,10 @@ public class Main extends Application{
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		Parent root = FXMLLoader.load(MainFrame.class.getResource("MainFrame.fxml"));
+		Parent root = FXMLLoader.load(MainFrame.class.getResource("Login.fxml"));
 		Scene scene = new Scene(root);
-		stage.setTitle("Book Store");
-		stage.getIcons().add(new Image(new FileInputStream("search.png")));
+		stage.setTitle("Book Store Login");
+		stage.getIcons().add(new Image(new FileInputStream("icon/searchColor.png")));
 		stage.setScene(scene);
 		stage.show();
 	}

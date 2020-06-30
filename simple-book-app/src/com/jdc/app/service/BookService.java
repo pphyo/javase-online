@@ -1,5 +1,7 @@
 package com.jdc.app.service;
 
+import static com.jdc.app.util.SqlHelper.*;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -18,10 +20,9 @@ import com.jdc.app.util.ConnectionManager;
 public class BookService {
 	
 	private static BookService INSTANCE;
-	private static final String sqlSearch = "select b.id, b.name book_name, b.price price, b.released_date released_date, b.remark remark, c.id category_id, c.name category_name, a.id author_id, a.name author_name from book b join category c on b.category_id = c.id join author a on b.author_id = a.id where 1 = 1";
 	
 	private BookService() {}
-	
+
 	public static BookService getInstance() {
 		if(null == INSTANCE)
 			INSTANCE = new BookService();
@@ -29,10 +30,8 @@ public class BookService {
 	}
 	
 	public void add(Book book) {
-		String sql = "insert into book (name, price, released_date, remark, category_id, author_id) values (?, ?, ?, ?, ?, ?)";
-	
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("book.insert"))) {
 			
 			stmt.setString(1, book.getName());
 			stmt.setInt(2, book.getPrice());
@@ -45,19 +44,16 @@ public class BookService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
-
+	
 	public void update(Book book) {
-		String sql = "update book set name = ?, price = ?, released_date = ?, remark = ?, category_id = ?, author_id = ? where id = ?";
-		
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("book.update"))) {
 			
 			stmt.setString(1, book.getName());
 			stmt.setInt(2, book.getPrice());
 			stmt.setDate(3, Date.valueOf(book.getReleaseDate()));
-			stmt.setString(4, book.getRemark());
+			stmt.setString(4, book.getRemark());			
 			stmt.setInt(5, book.getCategory().getId());
 			stmt.setInt(6, book.getAuthor().getId());
 			stmt.setInt(7, book.getId());
@@ -69,47 +65,50 @@ public class BookService {
 	}
 	
 	public void delete(Book book) {
-		String sql = "delete from book where id = ?";
-		
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("book.delete"))) {
 			
 			stmt.setInt(1, book.getId());
 			stmt.executeUpdate();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public List<Book> findAll() {
-		return findByParams(null, null, null);
+		return findByParams(null, null, null, null);
 	}
 	
-	public List<Book> findByParams(Category category, Author authorName, LocalDate realeaseDate) {
+	public List<Book> findByParams(Category category, Author authorName, String bookName, LocalDate releaseDate) {
 		List<Book> list = new ArrayList<>();
-		StringBuilder sb = new StringBuilder(sqlSearch);
+		StringBuilder sb = new StringBuilder(getSql("book.find"));
 		List<Object> params = new LinkedList<>();
 		
 		if(null != category) {
 			sb.append(" and c.name like ?");
-			params.add(category);
+			params.add(category.getName());
 		}
 		
 		if(null != authorName) {
 			sb.append(" and a.name like ?");
-			params.add(authorName);
+			params.add(authorName.getName());
 		}
 		
-		if(null != realeaseDate) {
-			sb.append(" and b.released_date >= ?");
-			params.add(Date.valueOf(realeaseDate));
+		if(null != bookName && !bookName.isEmpty()) {
+			sb.append(" and b.name like ?");
+			params.add("%".concat(bookName).concat("%"));
+		}
+		
+		if(null != releaseDate && releaseDate.isBefore(LocalDate.now())) {
+			sb.append(" and release_date >= ?");
+			params.add(Date.valueOf(releaseDate));
 		}
 		
 		try(Connection conn = ConnectionManager.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sb.toString())) {
 			
-			for(int i = 0; i < params.size(); i++) {
+			for (int i = 0; i < params.size(); i++) {
 				stmt.setObject(i + 1, params.get(i));
 			}
 			
@@ -125,57 +124,51 @@ public class BookService {
 	}
 	
 	public Book getObject(ResultSet rs) throws SQLException {
-		Book b = new Book();
-		b.setId(rs.getInt("id"));
-		b.setName(rs.getString("book_name"));
-		b.setPrice(rs.getInt("price"));
-		b.setReleaseDate(rs.getDate("released_date").toLocalDate());
-		b.setRemark(rs.getString("remark"));
+		Book book = new Book();
+		book.setId(rs.getInt("id"));
+		book.setName(rs.getString("book_name"));
+		book.setPrice(rs.getInt("price"));
+		book.setReleaseDate(rs.getDate("release_date").toLocalDate());
+		book.setRemark(rs.getString("remark"));
 		
-		Category c = new Category();
-		c.setId(rs.getInt("category_id"));
-		c.setName(rs.getString("category_name"));
+		Category cat = new Category();
+		cat.setName(rs.getString("category_name"));
 		
-		Author a = new Author();
-		a.setId(rs.getInt("author_id"));
-		a.setName(rs.getString("author_name"));
+		Author auth = new Author();
+		auth.setName(rs.getString("author_name"));
+		auth.setAge(rs.getInt("age"));
+		auth.setCountry(rs.getString("country"));
 		
-		b.setCategory(c);
-		b.setAuthor(a);
+		book.setCategory(cat);
+		book.setAuthor(auth);
 		
-		return b;
+		return book;
 	}
 	
-	public void imgUpload(Book book) {
-		String sql = "update book set book_image = ? where id = ?";
+	public void imageUpload(Book book) {
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("book.img"))) {
 			
 			stmt.setString(1, book.getImage());
 			stmt.setInt(2, book.getId());
 			stmt.executeUpdate();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public String getImage(Book book) {
-		String sql = "select book_image from book where id = ?";
+	public String findImage(Book book) {
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("book.img.find"))) {
 			
 			stmt.setInt(1, book.getId());
-			
 			ResultSet rs = stmt.executeQuery();
-			while(rs.next()) {
+			while(rs.next())
 				return rs.getString("book_image");
-			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return null;
 	}
 	

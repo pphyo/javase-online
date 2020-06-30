@@ -12,7 +12,7 @@
    <children>
       <HBox styleClass="search-bar">
          <children>
-            <TextField fx:id="name" promptText="Enter Author Name" styleClass="txt-fld" />
+            <TextField fx:id="authorName" promptText="Enter Author Name" styleClass="txt-fld" />
             <TextField fx:id="age" promptText="Enter age" styleClass="txt-fld" />
             <TextField fx:id="country" promptText="Enter Country" styleClass="txt-fld" />
             <Button mnemonicParsing="false" onAction="#add" styleClass="btn" text="ADD" />
@@ -20,11 +20,11 @@
             <Button mnemonicParsing="false" onAction="#clear" styleClass="btn" text="CLEAR" />
          </children>
       </HBox>
-      <HBox styleClass="pad10" VBox.vgrow="ALWAYS">
+      <VBox styleClass="pad10" VBox.vgrow="ALWAYS">
          <children>
-            <TableView fx:id="tblList" editable="true" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+            <TableView fx:id="tblList" editable="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
               <columns>
-                <TableColumn maxWidth="800.0" minWidth="30.0" prefWidth="30.0" text="ID">
+                <TableColumn maxWidth="60.0" minWidth="60.0" prefWidth="60.0" text="ID">
                 	<cellValueFactory>
                 		<PropertyValueFactory property="id" />
                 	</cellValueFactory>
@@ -34,7 +34,7 @@
                 		<PropertyValueFactory property="name" />
                 	</cellValueFactory>
                 </TableColumn>
-                  <TableColumn fx:id="ageCol" maxWidth="800.0" minWidth="30.0" prefWidth="40.0" text="Age">
+                  <TableColumn fx:id="ageCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Age">
                 	<cellValueFactory>
                 		<PropertyValueFactory property="age" />
                 	</cellValueFactory>
@@ -50,6 +50,6 @@
                </columnResizePolicy>
             </TableView>
          </children>
-      </HBox>
+      </VBox>
    </children>
 </VBox>

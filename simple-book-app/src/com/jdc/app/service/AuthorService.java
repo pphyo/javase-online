@@ -1,8 +1,11 @@
 package com.jdc.app.service;
 
+import static com.jdc.app.util.SqlHelper.getSql;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,18 +25,17 @@ public class AuthorService {
 			INSTANCE = new AuthorService();
 		return INSTANCE;
 	}
-
+	
 	public void add(Author a) {
-		String sql = "insert into author (name, age, country) values (?, ?, ?)";
 		
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("aut.insert"), Statement.RETURN_GENERATED_KEYS)) {
 			
 			stmt.setString(1, a.getName());
 			stmt.setInt(2, a.getAge());
 			stmt.setString(3, a.getCountry());
 			stmt.executeUpdate();
-			
+
 			ResultSet rs = stmt.getGeneratedKeys();
 			while(rs.next())
 				a.setId(rs.getInt(1));
@@ -44,16 +46,14 @@ public class AuthorService {
 	}
 	
 	public void update(Author a) {
-		String sql = "update author set name = ?, age = ?, country = ? where id = ?";
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("aut.update"))) {
 			
 			stmt.setString(1, a.getName());
 			stmt.setInt(2, a.getAge());
 			stmt.setString(3, a.getCountry());
 			stmt.setInt(4, a.getId());
-			stmt.executeUpdate();
-			
+			stmt.executeUpdate();			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -61,9 +61,8 @@ public class AuthorService {
 	}
 	
 	public void delete(Author a) {
-		String sql = "delete from author where id = ?";
 		try(Connection conn = ConnectionManager.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)) {
+				PreparedStatement stmt = conn.prepareStatement(getSql("aut.delete"))) {
 			
 			stmt.setInt(1, a.getId());
 			stmt.executeUpdate();
@@ -74,13 +73,12 @@ public class AuthorService {
 	}
 	
 	public List<Author> findAll() {
-		return finByParams(null, 0, null);
+		return findByParam(null, 0, null);
 	}
 	
-	public List<Author> finByParams(String name, int age, String country) {
-		String sql = "select * from author where 1 = 1";
+	public List<Author> findByParam(String name, int age, String country) {
 		List<Author> list = new ArrayList<>();
-		StringBuilder sb = new StringBuilder(sql);
+		StringBuffer sb = new StringBuffer(getSql("aut.find"));
 		List<Object> params = new LinkedList<>();
 		
 		if(null != name && !name.isEmpty()) {
@@ -88,12 +86,12 @@ public class AuthorService {
 			params.add("%".concat(name).concat("%"));
 		}
 		
-		if(age < 0) {
+		if(age > 0) {
 			sb.append(" and age >= ?");
 			params.add(age);
 		}
 		
-		if(null != country &&!country.isEmpty()) {
+		if(null != country && !country.isEmpty()) {
 			sb.append(" and country like ?");
 			params.add("%".concat(country).concat("%"));
 		}
@@ -107,18 +105,22 @@ public class AuthorService {
 			
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
-				Author a = new Author();
-				a.setId(rs.getInt("id"));
-				a.setName(rs.getString("name"));
-				a.setAge(rs.getInt("age"));
-				a.setCountry(rs.getString("country"));
-				list.add(a);
+				list.add(getObject(rs));
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return list;
 	}
+	
+	public Author getObject(ResultSet rs) throws SQLException {
+		Author aut = new Author();
+		aut.setId(rs.getInt(1));
+		aut.setName(rs.getString(2));
+		aut.setAge(rs.getInt(3));
+		aut.setCountry(rs.getString(4));
+		return aut;
+	}
+
 }

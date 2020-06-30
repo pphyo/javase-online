@@ -1,10 +1,9 @@
 package com.jdc.app.entity;
 
-import java.io.Serializable;
+import lombok.Data;
 
-public class Category implements Serializable{
-
-	private static final long serialVersionUID = 1L;
+@Data
+public class Category {
 
 	private int id;
 	private String name;
@@ -15,25 +14,8 @@ public class Category implements Serializable{
 		this.name = name;
 	}
 	
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 	@Override
 	public String toString() {
 		return name;
 	}
-
 }
